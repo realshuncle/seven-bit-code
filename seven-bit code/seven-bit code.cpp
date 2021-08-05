@@ -7,7 +7,6 @@ using namespace std;
 
 int main()
 {
-	setlocale(LC_ALL, "Russian");
 	ifstream in;
 	ofstream out;
 	string text = "";
@@ -26,7 +25,7 @@ int main()
 		text = text.substr(0, text.length() - 1);
 		bool flag;
 		int vib;
-		cout << "Введите: 1 - зашифровать; 2, - расшифровать" << endl;
+		cout << "Enter: 1 - encrypt; 2 - decrypt" << endl;
 		cin >> vib;
 		switch (vib)
 		{
@@ -37,7 +36,7 @@ int main()
 			flag = 1;
 			break;
 		default:
-			cout << "Неизвестная команда." << endl;
+			cout << "Unknown command." << endl;
 			system("pause");
 			return 1;
 			break;
@@ -49,25 +48,25 @@ int main()
 				text = text + " ";
 			for (int i = 0; i < text.length(); i += 7)
 			{
-				//массив с 7 символами, которые кодируются
+				// an array with 7 characters to be encoded
 				unsigned char temp[7];
 				for (int j = 0; j < 7; j++)
 					temp[j] = text[i + j];
-				//семибитный код
+				// seven-bit code
 				unsigned char sevenbit = 0;
-				//заполнение семибитного кода, привидение к unsigned char необзодимо для того, что бы лишние биты отбросились
+				// filling in the seven-bit code, casting to unsigned char is necessary in order for the extra bits to be discarded
 				for (int j = 0; j < 7; j++)
 					sevenbit = ((sevenbit << 1) | (unsigned char(temp[j] << 7) >> 7));
-				//запись в файл измененных символов:
-				//	1. отбрасвается последний бит
-				//	2. отбрасываются j первых битов 
-				//	3. добавляются первые j - 1 бит из следующего байта
+				// write changed symbols to file:
+				// 1.the last bit is discarded
+				// 2.the first j bits are discarded
+				// 3.the first j - 1 bits from the next byte are added
 				for (int j = 0; j < 6; j++)
 				{
 					unsigned char symbol = (unsigned char(temp[j] >> 1) << (j + 1)) | (temp[j + 1] >> (7 - j));
 					out.write((char*)&symbol, sizeof(symbol));
 				}
-				//формирование и запись последнего байта
+				// forming and writing the last byte
 				sevenbit = sevenbit | (unsigned char(temp[6] >> 1) << 7);
 				out.write((char*)&sevenbit, sizeof(sevenbit));
 			}
@@ -76,22 +75,22 @@ int main()
 		{
 			if (text.length() % 7 != 0)
 			{
-				cout << "Не возможно расшифровать файл." << endl;
+				cout << "It is not possible to decrypt the file." << endl;
 				system("pause");
 				return 1;
 			}
 			for (int i = 0; i < text.length(); i += 7)
 			{
-				//массив с 7 символами, которые раскодируются
+				// array with 7 characters to decode
 				unsigned char temp[7];
 				for (int j = 0; j < 7; j++)
 					temp[j] = text[i + j];
-				//семибитный код
+				// seven-bit code
 				unsigned char sevenbit = unsigned char(temp[6] << 1) >> 1;
-				//раскодирование символа:
-				//	1. отбрасвается последние j + 1 бит
-				//	2. если не первый бит, то добавляются последние 8 - j битов из предыдущего байта 
-				//	3. в конец добавляется символ из семибитного кода
+				// decode the character:
+				// 1.the last j + 1 bits are discarded
+				// 2.if not the first bit, then the last 8 - j bits from the previous byte are added
+				// 3.A character from a seven-bit code is added to the end
 				for (int j = 0; j < 7; j++)
 				{
 					unsigned char symbol = unsigned char(temp[j] >> (j + 1)) << 1 | (j != 0 ? temp[j - 1] << (8 - j) : 0) | (sevenbit >> 6);
@@ -102,10 +101,10 @@ int main()
 		}
 		out.close();
 		in.close();
-		cout << "Выполнено." << endl;
+		cout << "Done." << endl;
 	}
 	else
-		cout << "Файл не открыт." << endl;
+		cout << "The file is not open." << endl;
 	system("pause");
 	return 0;
 }

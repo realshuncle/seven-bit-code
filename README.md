@@ -1,4 +1,4 @@
-# seven-bit-code
+# Seven-bit code
 
 This program is designed to encrypt and decrypt text using a seven-bit code.
 
